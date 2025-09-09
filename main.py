@@ -80,10 +80,20 @@ for channel in CHANNELS:
     if member.status in ["left", "kicked"]:
         missing_channels.append(channel.strip())
 
-if missing_channels:
-    missing_list = "\n".join([f"- {ch}" for ch in missing_channels])
-    await message.answer(f"⚠️ Non sei ancora iscritto a:\n{missing_list}")
-    return
+    missing_channels = []
+    for channel in CHANNELS:
+        try:
+            member = await bot.get_chat_member(channel.strip(), user.id)
+            if member.status in ["left", "kicked"]:
+                missing_channels.append(channel.strip())
+        except:
+            missing_channels.append(channel.strip())
+
+    if missing_channels:
+        missing_list = "\n".join([f"- {ch}" for ch in missing_channels])
+        await message.answer(f"⚠️ Non sei ancora iscritto a:\n{missing_list}")
+        return
+
 
         return
     t=assign_ticket(cb.from_user.id, cb.from_user.username or "")
