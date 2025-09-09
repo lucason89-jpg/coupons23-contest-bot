@@ -74,7 +74,17 @@ async def start(m:Message):
 @dp.callback_query(F.data=="join")
 async def join(cb:CallbackQuery):
     if not await is_member(cb.from_user.id):
-        await cb.message.answer("⛔️ Devi essere iscritto a tutti i canali richiesti.")
+        missing_channels = []
+for channel in CHANNELS:
+    member = await bot.get_chat_member(channel.strip(), user.id)
+    if member.status in ["left", "kicked"]:
+        missing_channels.append(channel.strip())
+
+if missing_channels:
+    missing_list = "\n".join([f"- {ch}" for ch in missing_channels])
+    await message.answer(f"⚠️ Non sei ancora iscritto a:\n{missing_list}")
+    return
+
         return
     t=assign_ticket(cb.from_user.id, cb.from_user.username or "")
     await cb.message.answer(f"✅ Registrato! Il tuo numero è #{t:04d}. Usa /mystatus per rivederlo.")
